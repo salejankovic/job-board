@@ -7,9 +7,11 @@ const sourceColors: Record<string, string> = {
   linkedin: "bg-sky-100 text-sky-800",
   remoteok: "bg-green-100 text-green-800",
   weworkremotely: "bg-purple-100 text-purple-800",
-  indeed_es: "bg-orange-100 text-orange-800",
-  indeed_gr: "bg-cyan-100 text-cyan-800",
-  indeed_it: "bg-red-100 text-red-800",
+  jobicy: "bg-orange-100 text-orange-800",
+  jobicy_es: "bg-orange-100 text-orange-800",
+  jobicy_gr: "bg-cyan-100 text-cyan-800",
+  jobicy_it: "bg-red-100 text-red-800",
+  jobicy_eu: "bg-amber-100 text-amber-800",
 };
 
 const sourceLabels: Record<string, string> = {
@@ -17,9 +19,11 @@ const sourceLabels: Record<string, string> = {
   linkedin: "LinkedIn",
   remoteok: "RemoteOK",
   weworkremotely: "WeWorkRemotely",
-  indeed_es: "Indeed Spain",
-  indeed_gr: "Indeed Greece",
-  indeed_it: "Indeed Italy",
+  jobicy: "Jobicy",
+  jobicy_es: "Jobicy Spain",
+  jobicy_gr: "Jobicy Greece",
+  jobicy_it: "Jobicy Italy",
+  jobicy_eu: "Jobicy Europe",
 };
 
 export function JobCard({ job }: { job: Job }) {

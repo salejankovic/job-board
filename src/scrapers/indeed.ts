@@ -1,76 +1,78 @@
-import * as cheerio from "cheerio";
 import type { ScrapedJob, Scraper } from "./types";
 
-const QUERIES = ["marketing", "social media", "content", "PR", "digital marketing", "SEO"];
+// Replace Indeed (which blocks scrapers) with Jobicy API
+// Jobicy provides remote jobs with good European coverage
 
-const COUNTRIES = [
-  { code: "es", domain: "es.indeed.com", name: "Spain" },
-  { code: "gr", domain: "gr.indeed.com", name: "Greece" },
-  { code: "it", domain: "it.indeed.com", name: "Italy" },
-];
+interface JobicyJob {
+  id: number;
+  jobTitle: string;
+  companyName: string;
+  jobGeo: string;
+  jobLevel: string;
+  jobType: string[];
+  jobIndustry: string[];
+  salaryMin?: number;
+  salaryMax?: number;
+  salaryCurrency?: string;
+  jobExcerpt: string;
+  pubDate: string;
+  url: string;
+}
+
+const TAGS = ["marketing", "copywriting", "social-media", "seo", "content"];
+
+// Map Jobicy geo to our source labels
+function getSource(geo: string): string {
+  const g = geo.toLowerCase();
+  if (g.includes("spain") || g.includes("españa")) return "jobicy_es";
+  if (g.includes("greece") || g.includes("ελλάδα")) return "jobicy_gr";
+  if (g.includes("italy") || g.includes("italia")) return "jobicy_it";
+  if (g.includes("europe") || g.includes("emea")) return "jobicy_eu";
+  return "jobicy";
+}
 
 export const indeedScraper: Scraper = {
-  name: "indeed",
+  name: "jobicy",
   async scrape(): Promise<ScrapedJob[]> {
     const jobs: ScrapedJob[] = [];
 
-    for (const country of COUNTRIES) {
-      for (const query of QUERIES) {
-        try {
-          // Use English query on local Indeed domain
-          const url = `https://${country.domain}/jobs?q=${encodeURIComponent(query)}&l=&lang=en`;
-          const res = await fetch(url, {
-            headers: {
-              "User-Agent":
-                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-              "Accept-Language": "en-US,en;q=0.9",
-            },
+    for (const tag of TAGS) {
+      try {
+        const url = `https://jobicy.com/api/v2/remote-jobs?count=50&tag=${tag}`;
+        const res = await fetch(url, {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          },
+        });
+
+        if (!res.ok) continue;
+
+        const data = await res.json();
+        const jobList = (data.jobs || []) as JobicyJob[];
+
+        for (const item of jobList) {
+          const salary =
+            item.salaryMin && item.salaryMax
+              ? `${item.salaryCurrency || "$"}${item.salaryMin.toLocaleString()} - ${item.salaryCurrency || "$"}${item.salaryMax.toLocaleString()}`
+              : null;
+
+          jobs.push({
+            title: item.jobTitle.substring(0, 200),
+            company: item.companyName,
+            location: item.jobGeo || "Remote",
+            url: item.url,
+            source: getSource(item.jobGeo || ""),
+            description: (item.jobExcerpt || "").substring(0, 500),
+            salary,
+            tags: tag,
+            isRemote: true,
           });
-
-          if (!res.ok) continue;
-
-          const html = await res.text();
-          const $ = cheerio.load(html);
-
-          // Indeed job cards
-          $(".job_seen_beacon, .jobsearch-ResultsList .result, .tapItem, [data-jk]").each(
-            (_, el) => {
-              const $el = $(el);
-              const title =
-                $el.find("h2 a span, .jobTitle span, h2.jobTitle").first().text().trim();
-              const company =
-                $el.find("[data-testid='company-name'], .companyName, .company").first().text().trim();
-              const location =
-                $el.find("[data-testid='text-location'], .companyLocation, .location").first().text().trim();
-              const href =
-                $el.find("h2 a, a.jcs-JobTitle").first().attr("href") || "";
-              const salary =
-                $el.find(".salary-snippet-container, .estimated-salary, .metadata.salary-snippet-container").first().text().trim() || null;
-
-              if (title && title.length > 3) {
-                const fullUrl = href.startsWith("http")
-                  ? href
-                  : `https://${country.domain}${href}`;
-                jobs.push({
-                  title: title.substring(0, 200),
-                  company: company || "Unknown",
-                  location: location || country.name,
-                  url: fullUrl,
-                  source: `indeed_${country.code}`,
-                  description: null,
-                  salary,
-                  tags: query,
-                  isRemote: false,
-                });
-              }
-            }
-          );
-
-          // Rate limit
-          await new Promise((r) => setTimeout(r, 2000));
-        } catch (err) {
-          console.error(`Indeed ${country.code} scrape error for "${query}":`, err);
         }
+
+        await new Promise((r) => setTimeout(r, 1000));
+      } catch (err) {
+        console.error(`Jobicy scrape error for "${tag}":`, err);
       }
     }
 

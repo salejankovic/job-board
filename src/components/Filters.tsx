@@ -15,9 +15,11 @@ const SOURCES = [
   { value: "linkedin", label: "LinkedIn" },
   { value: "remoteok", label: "RemoteOK" },
   { value: "weworkremotely", label: "WeWorkRemotely" },
-  { value: "indeed_es", label: "Indeed Spain" },
-  { value: "indeed_gr", label: "Indeed Greece" },
-  { value: "indeed_it", label: "Indeed Italy" },
+  { value: "jobicy", label: "Jobicy (Remote)" },
+  { value: "jobicy_es", label: "Jobicy Spain" },
+  { value: "jobicy_gr", label: "Jobicy Greece" },
+  { value: "jobicy_it", label: "Jobicy Italy" },
+  { value: "jobicy_eu", label: "Jobicy Europe" },
 ];
 
 export function Filters({
