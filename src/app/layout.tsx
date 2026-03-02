@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Job Board - Marketing & PR Jobs",
+  title: "Bekin novi posao",
   description: "Job scraper for marketing and PR positions across Serbia, remote, and Europe",
 };
 
@@ -29,7 +29,7 @@ export default function RootLayout({
       >
         <nav className="bg-white border-b border-gray-200 px-6 py-3 flex items-center justify-between">
           <a href="/" className="text-xl font-bold text-gray-900">
-            Job Board
+            Bekin novi posao
           </a>
           <div className="flex gap-4">
             <a href="/" className="text-gray-600 hover:text-gray-900">
