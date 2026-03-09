@@ -74,6 +74,7 @@ export const remoteokScraper: Scraper = {
           salary,
           tags: (item.tags || []).join(","),
           isRemote: true,
+          postedAt: item.date || (item.epoch ? new Date(item.epoch * 1000).toISOString() : null),
         });
       }
     } catch (err) {

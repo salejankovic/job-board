@@ -76,8 +76,11 @@ export function JobCard({ job }: { job: Job }) {
         <p className="text-sm text-gray-500 mt-2 line-clamp-2">{job.description}</p>
       )}
 
-      <div className="text-xs text-gray-400 mt-2">
-        Scraped: {new Date(job.scrapedAt).toLocaleDateString()}
+      <div className="flex gap-3 text-xs text-gray-400 mt-2">
+        {job.postedAt && (
+          <span>Posted: {new Date(job.postedAt).toLocaleDateString()}</span>
+        )}
+        <span>Scraped: {new Date(job.scrapedAt).toLocaleDateString()}</span>
       </div>
     </div>
   );

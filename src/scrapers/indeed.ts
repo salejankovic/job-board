@@ -67,6 +67,7 @@ export const indeedScraper: Scraper = {
             salary,
             tags: tag,
             isRemote: true,
+            postedAt: item.pubDate || null,
           });
         }
 
