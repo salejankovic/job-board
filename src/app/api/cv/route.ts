@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     if (file.type === "application/pdf") {
       const buffer = Buffer.from(await file.arrayBuffer());
-      const parser = new PDFParse(buffer);
+      const parser = new PDFParse(buffer) as any; // eslint-disable-line @typescript-eslint/no-explicit-any
       await parser.load();
       extractedText = await parser.getText();
     } else if (
